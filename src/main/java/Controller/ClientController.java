@@ -1,7 +1,9 @@
 package Controller;
 
 import Model.ClientModel;
+import Model.Usertxt;
 import Views.LoginViews;
+import Views.AccountViews;
 
 public class ClientController {
 
@@ -13,13 +15,11 @@ public class ClientController {
         showLogin();
     }
 
-
     public void showLogin() {
         LoginViews loginView = new LoginViews();
         new LoginController(loginView, model, this);
         loginView.setVisible(true);
     }
-
 
     public void navigateAfterLogin(String role) {
         if (role.equalsIgnoreCase("admin")) {
@@ -31,13 +31,20 @@ public class ClientController {
         }
     }
 
+
     private void showAdminDashboard() {
         System.out.println("Mở giao diện Admin...");
 
+
+        Usertxt txtModel = new Usertxt();
+        Controller.AccountController accountController = new Controller.AccountController(txtModel);
+
+
+        new AccountViews(accountController);
     }
 
     private void showStaffDashboard() {
         System.out.println("Mở giao diện Nhân viên...");
-
+        // TODO: tạo giao diện StaffView nếu cần
     }
 }

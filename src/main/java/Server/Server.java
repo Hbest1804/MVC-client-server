@@ -18,7 +18,8 @@ public class Server {
 
             while (true) {
                 Socket clientSocket = serverSocket.accept();
-                view.showMessage("Client kết nối: " + clientSocket.getInetAddress().toString() + ":" + clientSocket.getPort());
+                view.showMessage("Kết nối mới từ: " + clientSocket.getInetAddress().toString() + ":" + clientSocket.getPort());
+
 
                 new Thread(() -> controller.handleClient(clientSocket)).start();
             }

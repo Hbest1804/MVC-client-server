@@ -17,16 +17,15 @@ public class ServerController {
     }
 
     public void handleClient(Socket clientSocket) {
-
         String clientName = clientSocket.getInetAddress().toString() + ":" + clientSocket.getPort();
-        view.showMessage("Client đã kết nối: " + clientName);
 
-        try {
-            ObjectOutputStream oos = new ObjectOutputStream(clientSocket.getOutputStream());
-            ObjectInputStream ois = new ObjectInputStream(clientSocket.getInputStream());
+        try (ObjectOutputStream oos = new ObjectOutputStream(clientSocket.getOutputStream());
+             ObjectInputStream ois = new ObjectInputStream(clientSocket.getInputStream())) {
+
 
             String username = (String) ois.readObject();
             String password = (String) ois.readObject();
+
 
             User user = model.loginDatabase(username, password);
             if (user == null) {
@@ -36,7 +35,7 @@ public class ServerController {
             if (user != null) {
                 oos.writeObject("SUCCESS:" + user.getRole());
                 oos.flush();
-                view.showMessage(username + " đăng nhập thành công!");
+                view.showMessage(username + " đăng nhập thành công với tư cách: " + user.getRole());
             } else {
                 oos.writeObject("FAIL");
                 oos.flush();
@@ -44,9 +43,16 @@ public class ServerController {
             }
 
         } catch (Exception e) {
-            view.showMessage("Lỗi client: " + clientName);
+            view.showMessage("Lỗi client: " + clientName + " | " + e.getMessage());
         } finally {
-            view.showMessage("Client đã thoát: " + clientName);
+            try {
+                if (!clientSocket.isClosed()) {
+                    clientSocket.close(); // Đảm bảo đóng socket
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
         }
     }
 }

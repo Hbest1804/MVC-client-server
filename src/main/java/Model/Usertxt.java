@@ -1,7 +1,9 @@
 package Model;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +23,25 @@ public class Usertxt {
             e.printStackTrace();
         }
         return list;
+    }
+    private void writeUsers(List<User> users) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(file_name))) {
+            for (User u : users) {
+                bw.write(u.getUsername() + "," + u.getPassword() + "," + u.getRole());
+                bw.newLine();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    public boolean addUser(User user) {
+        List<User> users = readUsers();
+        for (User u : users) {
+            if (u.getUsername().equals(user.getUsername())) return false; // username trùng
+        }
+        users.add(user);
+        writeUsers(users);
+        return true;
     }
 
 }

@@ -34,12 +34,6 @@ public class ServerViews extends JFrame {
         txtLog.append(message + "\n");
     }
 
-    // Hai hàm này giữ lại để tránh lỗi khi ServerController gọi
-    public void addClient(String clientName) {
-        // Không làm gì nữa
-    }
 
-    public void removeClient(String clientName) {
-        // Không làm gì nữa
-    }
+
 }

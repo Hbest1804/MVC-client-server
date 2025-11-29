@@ -17,14 +17,12 @@ public class ServerModel {
         return dao.login(username, password);
     }
 
-
     public User loginTxt(String username, String password) {
         return usertxt.readUsers().stream()
                 .filter(u -> u.getUsername().equals(username) && u.getPassword().equals(password))
                 .findFirst()
                 .orElse(null);
     }
-
 
     public User login(String username, String password) {
         User user = loginDatabase(username, password);
