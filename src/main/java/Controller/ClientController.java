@@ -1,9 +1,8 @@
 package Controller;
 
 import Model.ClientModel;
-import Model.Usertxt;
 import Views.LoginViews;
-import Views.AccountViews;
+import Views.AdminViews;
 
 public class ClientController {
 
@@ -11,7 +10,6 @@ public class ClientController {
 
     public ClientController(ClientModel model) {
         this.model = model;
-
         showLogin();
     }
 
@@ -21,30 +19,31 @@ public class ClientController {
         loginView.setVisible(true);
     }
 
+    // Điều hướng sau khi đăng nhập dựa trên vai trò
     public void navigateAfterLogin(String role) {
         if (role.equalsIgnoreCase("admin")) {
-            showAdminDashboard();
+            showAdmin();
         } else if (role.equalsIgnoreCase("nhanvien")) {
             showStaffDashboard();
         } else {
             System.out.println("Chuyển sang trang với role: " + role);
         }
     }
-
-
-    private void showAdminDashboard() {
+    // Mở giao diện Admin
+    private void showAdmin() {
         System.out.println("Mở giao diện Admin...");
-
-
-        Usertxt txtModel = new Usertxt();
-        Controller.AccountController accountController = new Controller.AccountController(txtModel);
-
-
-        new AccountViews(accountController);
+        AdminViews adminView = new AdminViews(this);
+        adminView.setVisible(true);
     }
 
     private void showStaffDashboard() {
         System.out.println("Mở giao diện Nhân viên...");
-        // TODO: tạo giao diện StaffView nếu cần
+    }
+
+    // Mở giao diện quản lý tài khoản
+    public void openAccountManager() {
+        Model.Usertxt txtModel = new Model.Usertxt();
+        Controller.AccountController accountController = new Controller.AccountController(txtModel);
+        new Views.AccountViews(accountController);
     }
 }

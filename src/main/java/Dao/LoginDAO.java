@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+// DAO cho việc đăng nhập từ MySQL
 public class LoginDAO {
 
     private Database db;
@@ -15,7 +16,6 @@ public class LoginDAO {
     public LoginDAO() {
         db = new Database();
     }
-
 
     public User login(String username, String password) {
         String sql = "SELECT * FROM users WHERE username=? AND password=?";

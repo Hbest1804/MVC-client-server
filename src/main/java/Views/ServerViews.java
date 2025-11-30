@@ -5,6 +5,7 @@ import javax.swing.text.DefaultCaret;
 import java.awt.*;
 
 public class ServerViews extends JFrame {
+
     private JTextArea txtLog;
 
     public ServerViews() {
@@ -16,12 +17,12 @@ public class ServerViews extends JFrame {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         getContentPane().add(panel);
 
-
         txtLog = new JTextArea();
         txtLog.setEditable(false);
         txtLog.setLineWrap(true);
         txtLog.setWrapStyleWord(true);
 
+        // Tự động kéo xuống cuối khi log thêm
         DefaultCaret caret = (DefaultCaret) txtLog.getCaret();
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 
@@ -33,7 +34,4 @@ public class ServerViews extends JFrame {
     public void showMessage(String message) {
         txtLog.append(message + "\n");
     }
-
-
-
 }

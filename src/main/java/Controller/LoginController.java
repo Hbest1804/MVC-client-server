@@ -25,7 +25,7 @@ public class LoginController {
             }
         });
     }
-
+    // Xử lý đăng nhập
     private void login() {
         String username = view.getUsername();
         String password = view.getPassword();

@@ -7,6 +7,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
+// Controller cho Server, xử lý logic đăng nhập từ client
 public class ServerController {
     private ServerModel model;
     private ServerViews view;
@@ -15,7 +16,7 @@ public class ServerController {
         this.model = model;
         this.view = view;
     }
-
+// Xử lý đăng nhập từ client
     public void handleClient(Socket clientSocket) {
         String clientName = clientSocket.getInetAddress().toString() + ":" + clientSocket.getPort();
 
@@ -47,11 +48,12 @@ public class ServerController {
         } finally {
             try {
                 if (!clientSocket.isClosed()) {
-                    clientSocket.close(); // Đảm bảo đóng socket
+                    clientSocket.close();
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
+
 
         }
     }

@@ -88,48 +88,44 @@ public class AccountController {
 
         User user = new User(username, password, role);
 
+        boolean success = true;
 
-        boolean txtOk = txtModel.addUser(user);
+        if (!txtModel.addUser(user)) {
+            success = false;
+        }
 
-        boolean dbOk = false;
         String checkSql = "SELECT COUNT(*) FROM users WHERE username=?";
         String insertSql = "INSERT INTO users(username, password, role) VALUES(?,?,?)";
 
         try (Connection conn = db.getConnection()) {
             if (conn == null || conn.isClosed()) {
-                JOptionPane.showMessageDialog(null, "Không thể kết nối DB!");
+                success = false;
             } else {
-
                 try (PreparedStatement checkStmt = conn.prepareStatement(checkSql)) {
                     checkStmt.setString(1, username);
                     try (ResultSet rs = checkStmt.executeQuery()) {
                         if (rs.next() && rs.getInt(1) > 0) {
-                            JOptionPane.showMessageDialog(null, "Username đã tồn tại trong DB!");
+                            success = false; // Username đã tồn tại
                         } else {
-                            // Thêm mới
                             try (PreparedStatement ps = conn.prepareStatement(insertSql)) {
                                 ps.setString(1, username);
                                 ps.setString(2, password);
                                 ps.setString(3, role);
-                                dbOk = ps.executeUpdate() > 0;
+                                if (ps.executeUpdate() <= 0) success = false;
                             }
                         }
                     }
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            success = false;
         }
 
-
-        if (txtOk && dbOk) {
-            JOptionPane.showMessageDialog(null, "Thêm tài khoản thành công vào cả TXT và DB!");
-        } else if (txtOk) {
-            JOptionPane.showMessageDialog(null, "Thêm vào TXT thành công, DB thất bại!");
-        } else if (dbOk) {
-            JOptionPane.showMessageDialog(null, "Thêm vào DB thành công, TXT thất bại!");
+        if (success) {
+            JOptionPane.showMessageDialog(null, "Thêm thành công!");
         } else {
             JOptionPane.showMessageDialog(null, "Thêm thất bại!");
         }
     }
+
 }
