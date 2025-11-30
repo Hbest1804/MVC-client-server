@@ -50,12 +50,12 @@ public class LoginController {
             }
 
 
-            mainController.navigateAfterLogin(role);
+            mainController.navigateAfterLogin(role, view);
 
         } else if (result.equals("FAIL")) {
             view.showMessage("Sai username hoặc mật khẩu!");
         } else {
-            view.showMessage("Lỗi kết nối server!");
+            view.showMessage("Không đăng nhập được");
         }
     }
 

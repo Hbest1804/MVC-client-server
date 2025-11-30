@@ -28,19 +28,29 @@ public class ClientModel {
     // Gửi username + password và nhận kết quả login
     public String login(String username, String password) {
         try {
-            connect(); // giữ kết nối luôn mở
+            if (socket == null || socket.isClosed()) {
+                socket = new Socket(serverIP, serverPort);
+                oos = new ObjectOutputStream(socket.getOutputStream());
+                ois = new ObjectInputStream(socket.getInputStream());
+            }
 
             oos.writeObject(username);
             oos.writeObject(password);
             oos.flush();
 
-            return (String) ois.readObject();
+            String result = (String) ois.readObject();
+
+            // Server luôn đóng socket sau khi trả kết quả → Client cũng phải đóng
+            socket.close();
+
+            return result;
 
         } catch (Exception e) {
             e.printStackTrace();
             return "ERROR";
         }
     }
+
 
     // Gửi tin nhắn hoặc lệnh sau login
     public void send(String msg) throws IOException {

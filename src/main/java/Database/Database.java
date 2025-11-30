@@ -19,7 +19,7 @@ public class Database {
                     String insert = "INSERT INTO users(username,password,role) VALUES('admin','123','admin')";
                     try (PreparedStatement psInsert = conn.prepareStatement(insert)) {
                         psInsert.executeUpdate();
-                        System.out.println("Đã tạo user admin mặc định");
+                        System.out.println("Đã tạo admin mặc định");
                     }
                 }
             }

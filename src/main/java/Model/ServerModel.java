@@ -1,20 +1,19 @@
 package Model;
 
 import DAO.LoginDAO;
-import java.util.Optional;
 
 public class ServerModel {
-    private LoginDAO dao;
+    private LoginDAO DAO;
     private Usertxt usertxt;
 
     public ServerModel() {
-        dao = new LoginDAO();
+        DAO = new LoginDAO();
         usertxt = new Usertxt();
     }
 
 
     public User loginDatabase(String username, String password) {
-        return dao.login(username, password);
+        return DAO.login(username, password);
     }
 
     public User loginTxt(String username, String password) {

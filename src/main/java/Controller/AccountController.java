@@ -11,6 +11,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class AccountController {
     private Usertxt txtModel;
@@ -30,7 +31,7 @@ public class AccountController {
         allUsers.addAll(txtUsers);
 
         // Load từ MySQL
-        String sql = "SELECT username, password, role FROM users";
+        String sql = "SELECT username, password, role, phone, employee_code FROM users";
         try (Connection conn = db.getConnection()) {
             if (conn == null || conn.isClosed()) {
                 JOptionPane.showMessageDialog(null, "Không thể kết nối DB!");
@@ -44,12 +45,13 @@ public class AccountController {
                     String username = rs.getString("username");
                     String password = rs.getString("password");
                     String role = rs.getString("role");
+                    String phone = rs.getString("phone");
+                    String employeeCode = rs.getString("employee_code");
 
-                    // Kiểm tra nếu đã có trong danh sách TXT thì không thêm trùng
                     boolean exists = allUsers.stream()
                             .anyMatch(u -> u.getUsername().equals(username));
                     if (!exists) {
-                        allUsers.add(new User(username, password, role));
+                        allUsers.add(new User(username, password, role, phone, employeeCode));
                     }
                 }
 
@@ -61,17 +63,19 @@ public class AccountController {
         return allUsers;
     }
 
-
+    // Thêm tài khoản mới
     public void addAccount() {
         JTextField txtUsername = new JTextField();
         JTextField txtPassword = new JTextField();
+        JTextField txtPhone = new JTextField();
         String[] roles = {"admin", "nhanvien"};
         JComboBox<String> roleBox = new JComboBox<>(roles);
 
         Object[] inputs = {
                 "Username:", txtUsername,
                 "Password:", txtPassword,
-                "Role:", roleBox
+                "Role:", roleBox,
+                "Phone:", txtPhone
         };
 
         int result = JOptionPane.showConfirmDialog(null, inputs, "Thêm tài khoản", JOptionPane.OK_CANCEL_OPTION);
@@ -80,22 +84,28 @@ public class AccountController {
         String username = txtUsername.getText().trim();
         String password = txtPassword.getText().trim();
         String role = (String) roleBox.getSelectedItem();
+        String phone = txtPhone.getText().trim();
 
-        if (username.isEmpty() || password.isEmpty()) {
+        if (username.isEmpty() || password.isEmpty() || phone.isEmpty()) {
             JOptionPane.showMessageDialog(null, "Vui lòng nhập đầy đủ thông tin!");
             return;
         }
 
-        User user = new User(username, password, role);
+        // Tạo employeeCode ngẫu nhiên
+        String employeeCode = generateEmployeeCode();
+
+        User user = new User(username, password, role, phone, employeeCode);
 
         boolean success = true;
 
+        // Thêm vào TXT
         if (!txtModel.addUser(user)) {
             success = false;
         }
 
+        // Thêm vào MySQL
         String checkSql = "SELECT COUNT(*) FROM users WHERE username=?";
-        String insertSql = "INSERT INTO users(username, password, role) VALUES(?,?,?)";
+        String insertSql = "INSERT INTO users(username, password, role, phone, employee_code) VALUES(?,?,?,?,?)";
 
         try (Connection conn = db.getConnection()) {
             if (conn == null || conn.isClosed()) {
@@ -111,6 +121,9 @@ public class AccountController {
                                 ps.setString(1, username);
                                 ps.setString(2, password);
                                 ps.setString(3, role);
+                                ps.setString(4, phone);
+                                ps.setString(5, employeeCode);
+
                                 if (ps.executeUpdate() <= 0) success = false;
                             }
                         }
@@ -118,14 +131,76 @@ public class AccountController {
                 }
             }
         } catch (SQLException e) {
+            e.printStackTrace();
             success = false;
         }
 
         if (success) {
-            JOptionPane.showMessageDialog(null, "Thêm thành công!");
+            JOptionPane.showMessageDialog(null, "Thêm thành công!\nMã nhân viên: " + employeeCode);
         } else {
             JOptionPane.showMessageDialog(null, "Thêm thất bại!");
         }
     }
 
+    // Hàm tạo mã nhân viên ngẫu nhiên
+    private String generateEmployeeCode() {
+        Random random = new Random();
+        String code;
+        do {
+            code = "NV" + (1000 + random.nextInt(9000)); // NVxxxx
+        } while (checkEmployeeCodeExists(code)); // tránh trùng
+        return code;
+    }
+
+    // Kiểm tra mã nhân viên đã tồn tại trong DB hay chưa
+    private boolean checkEmployeeCodeExists(String code) {
+        String sql = "SELECT COUNT(*) FROM users WHERE employee_code=?";
+        try (Connection conn = db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, code);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next() && rs.getInt(1) > 0) return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // Xóa tài khoản
+    public void deleteAccount(String username) {
+        boolean success = true;
+
+        if (!txtModel.deleteUser(username)) {
+            success = false;
+        }
+
+        String deleteSql = "DELETE FROM users WHERE username=?";
+
+        try (Connection conn = db.getConnection()) {
+            if (conn == null || conn.isClosed()) {
+                success = false;
+            } else {
+                try (PreparedStatement ps = conn.prepareStatement(deleteSql)) {
+                    ps.setString(1, username);
+                    if (ps.executeUpdate() <= 0) success = false;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            success = false;
+        }
+
+        if (success) {
+            JOptionPane.showMessageDialog(null, "Xóa thành công!");
+        } else {
+            JOptionPane.showMessageDialog(null, "Xóa thất bại!");
+        }
+    }
+
+
+    public void editAccount(String username) {
+
+
+    }
 }
