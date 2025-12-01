@@ -60,6 +60,17 @@ public class Usertxt {
         writeUsers(users);
         return true;
     }
+    public boolean updateUser(User updatedUser) {
+        List<User> users = readUsers();
+        for (int i = 0; i < users.size(); i++) {
+            if (users.get(i).getUsername().equals(updatedUser.getUsername())) {
+                users.set(i, updatedUser);
+                writeUsers(users);
+                return true;
+            }
+        }
+        return false;
+    }
 
 
 }

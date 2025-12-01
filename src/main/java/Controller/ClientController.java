@@ -47,7 +47,6 @@ public class ClientController {
     public void openAccountManager() {
         Model.Usertxt txtModel = new Model.Usertxt();
         AccountController accountController = new AccountController(txtModel);
-
         new AccountViews(accountController, this);
     }
 

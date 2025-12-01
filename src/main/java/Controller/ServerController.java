@@ -45,67 +45,29 @@ public class ServerController {
             oos.flush();
             view.showMessage(username + " đăng nhập thành công (" + user.getRole() + ")");
 
-            // ===== 2) GIỮ KẾT NỐI THEO ROLE =====
+
             while (true) {
                 Object requestObj = ois.readObject();
                 if (requestObj == null) continue;
 
                 String command = requestObj.toString().trim();
 
-                if (command.equals("LOGOUT")) {
-                    view.showMessage(username + " đã đăng xuất!");
-                    oos.writeObject("SERVER_LOGOUT_OK");
-                    oos.flush();
+                if (command.equalsIgnoreCase("LOGOUT")) {
+                    view.showMessage(username + " đã đăng xuất.");
                     break;
-                }
-
-                // ===== Xử lý theo role =====
-                if (user.getRole().equalsIgnoreCase("admin")) {
-                    switch (command) {
-                        case "QUAN_LY_TAI_KHOAN":
-                            view.showMessage(username + " đang quản lý tài khoản");
-                            oos.writeObject("SERVER_OK_ACCOUNT");
-                            break;
-                        case "QUAN_LY_SAN_PHAM":
-                            view.showMessage(username + " đang quản lý sản phẩm");
-                            oos.writeObject("SERVER_OK_PRODUCT");
-                            break;
-                        case "QUAN_LY_DON_HANG":
-                            view.showMessage(username + " đang quản lý đơn hàng");
-                            oos.writeObject("SERVER_OK_ORDER");
-                            break;
-                        default:
-                            oos.writeObject("SERVER_UNKNOWN_CMD");
-                    }
-                } else if (user.getRole().equalsIgnoreCase("nhanvien")) {
-                    switch (command) {
-                        case "BAN_HANG":
-                            view.showMessage(username + " đang bán hàng...");
-                            oos.writeObject("SERVER_OK_BAN_HANG");
-                            break;
-                        case "XEM_SAN_PHAM":
-                            view.showMessage(username + " đang xem sản phẩm");
-                            oos.writeObject("SERVER_OK_XEM_SP");
-                            break;
-                        default:
-                            oos.writeObject("SERVER_UNKNOWN_CMD");
-                    }
                 } else {
-                    oos.writeObject("SERVER_UNKNOWN_ROLE");
+                    view.showMessage("Nhận từ " + username + ": " + command);
+                    oos.writeObject("Server đã nhận: " + command);
+                    oos.flush();
                 }
 
-                oos.flush();
+
+
             }
 
         } catch (Exception e) {
-            view.showMessage("Lỗi với client " + clientName + ": " + e.getMessage());
-        } finally {
-            try {
-                clientSocket.close();
-                view.showMessage("Đã đóng kết nối với " + clientName);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            e.printStackTrace();
+
         }
     }
 }
