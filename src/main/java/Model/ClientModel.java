@@ -2,6 +2,7 @@ package Model;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.SocketException;
 
 public class ClientModel {
     private String serverIP;
@@ -16,35 +17,32 @@ public class ClientModel {
         this.serverPort = serverPort;
     }
 
-    // Chỉ connect nếu chưa kết nối
-    public void connect() throws Exception {
+
+    public void connect() throws IOException {
         if (socket == null || socket.isClosed()) {
             socket = new Socket(serverIP, serverPort);
             oos = new ObjectOutputStream(socket.getOutputStream());
+            oos.flush();
             ois = new ObjectInputStream(socket.getInputStream());
         }
     }
 
-    // Gửi username + password và nhận kết quả login
+
     public String login(String username, String password) {
         try {
-            if (socket == null || socket.isClosed()) {
-                socket = new Socket(serverIP, serverPort);
-                oos = new ObjectOutputStream(socket.getOutputStream());
-                ois = new ObjectInputStream(socket.getInputStream());
-            }
-
+            connect();
+            oos.writeObject("LOGIN");
             oos.writeObject(username);
             oos.writeObject(password);
             oos.flush();
 
-            String result = (String) ois.readObject();
+            Object response = ois.readObject();
+            return response.toString();
 
-            // Server luôn đóng socket sau khi trả kết quả → Client cũng phải đóng
-            socket.close();
-
-            return result;
-
+        } catch (SocketException se) {
+            System.out.println("Server đã đóng kết nối: " + se.getMessage());
+            closeConnection();
+            return "FAIL";
         } catch (Exception e) {
             e.printStackTrace();
             return "ERROR";
@@ -52,23 +50,49 @@ public class ClientModel {
     }
 
 
-    // Gửi tin nhắn hoặc lệnh sau login
-    public void send(String msg) throws IOException {
-        oos.writeObject(msg);
-        oos.flush();
-    }
-
-    // Nhận dữ liệu từ server sau login
-    public Object receive() throws Exception {
-        return ois.readObject();
-    }
-
-    // Đóng kết nối (khi tắt ứng dụng)
-    public void close() {
+    public void send(String msg) {
         try {
+            if (socket != null && !socket.isClosed()) {
+                oos.writeObject(msg);
+                oos.flush();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            closeConnection();
+        }
+    }
+
+
+    public Object receive() {
+        try {
+            if (socket != null && !socket.isClosed()) {
+                return ois.readObject();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            closeConnection();
+        }
+        return null;
+    }
+
+    // Logout
+    public void logout() {
+        send("LOGOUT");
+        closeConnection();
+    }
+
+
+    public void closeConnection() {
+        try {
+            if (oos != null) oos.close();
+            if (ois != null) ois.close();
             if (socket != null && !socket.isClosed()) socket.close();
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            socket = null;
+            oos = null;
+            ois = null;
         }
     }
 }

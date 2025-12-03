@@ -22,7 +22,7 @@ public class AccountController {
         this.db = new Database();
     }
 
-    // Load tất cả tài khoản từ TXT + DB
+
     public List<User> loadAccounts() {
         List<User> allUsers = new ArrayList<>();
         allUsers.addAll(txtModel.readUsers());
@@ -53,7 +53,7 @@ public class AccountController {
         return allUsers;
     }
 
-    // Thêm tài khoản
+
     public boolean addAccount(User user) {
         boolean success = txtModel.addUser(user);
 
@@ -77,7 +77,7 @@ public class AccountController {
         return success;
     }
 
-    // Sửa tài khoản
+
     public boolean editAccount(User user) {
         boolean success = txtModel.updateUser(user);
 
@@ -100,7 +100,7 @@ public class AccountController {
         return success;
     }
 
-    // Xóa tài khoản
+
     public boolean deleteAccount(String username) {
         boolean success = txtModel.deleteUser(username);
 
@@ -119,7 +119,7 @@ public class AccountController {
         return success;
     }
 
-    // Tạo mã nhân viên ngẫu nhiên
+
     public String generateEmployeeCode() {
         Random random = new Random();
         String code;

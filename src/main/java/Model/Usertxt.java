@@ -1,27 +1,36 @@
 package Model;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Usertxt {
     private String file_name = "src/main/java/users.txt";
 
+
     public List<User> readUsers() {
         List<User> list = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(file_name))) {
             String line;
             while ((line = br.readLine()) != null) {
-                String[] parts = line.split(",");
-                // username,password,role,phone,employeeCode
-                if (parts.length == 5) {
-                    list.add(new User(parts[0], parts[1], parts[2], parts[3], parts[4]));
+                line = line.trim();
+                if (line.isEmpty()) continue;
+
+                String[] parts = line.split("\\s+");
+                if (parts.length >= 5) {
+                    String username = parts[0];
+                    String password = parts[1];
+                    String role = parts[2];
+                    String phone = parts[3];
+                    String employeeCode = parts[4];
+                    list.add(new User(username, password, role, phone, employeeCode));
+                } else {
+                    System.out.println("Dữ liệu dòng không hợp lệ: " + line);
                 }
             }
-        } catch (Exception e) {
+        } catch (FileNotFoundException e) {
+            System.out.println("File không tồn tại, sẽ tạo file mới khi ghi dữ liệu.");
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return list;
@@ -31,35 +40,34 @@ public class Usertxt {
     private void writeUsers(List<User> users) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(file_name))) {
             for (User u : users) {
-                bw.write(
-                        u.getUsername() + "," +
-                                u.getPassword() + "," +
-                                u.getRole() + "," +
-                                u.getPhone() + "," +
-                                u.getEmployeeCode()
-                );
+                // Ghi tất cả thông tin trên cùng một dòng, cách nhau bởi khoảng trắng
+                bw.write(u.getUsername() + " " + u.getPassword() + " " + u.getRole() + " " + u.getPhone() + " " + u.getEmployeeCode());
                 bw.newLine();
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
+
     public boolean addUser(User user) {
         List<User> users = readUsers();
         for (User u : users) {
-            if (u.getUsername().equals(user.getUsername())) return false; 
+            if (u.getUsername().equals(user.getUsername())) return false; // username trùng
         }
         users.add(user);
         writeUsers(users);
         return true;
     }
 
+
     public boolean deleteUser(String username) {
         List<User> users = readUsers();
-        users.removeIf(u -> u.getUsername().equals(username));
-        writeUsers(users);
-        return true;
+        boolean removed = users.removeIf(u -> u.getUsername().equals(username));
+        if (removed) writeUsers(users);
+        return removed;
     }
+
     public boolean updateUser(User updatedUser) {
         List<User> users = readUsers();
         for (int i = 0; i < users.size(); i++) {
@@ -71,6 +79,4 @@ public class Usertxt {
         }
         return false;
     }
-
-
 }

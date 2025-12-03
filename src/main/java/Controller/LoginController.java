@@ -17,7 +17,6 @@ public class LoginController {
         this.model = model;
         this.mainController = mainController;
 
-
         this.view.addLoginListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -25,7 +24,7 @@ public class LoginController {
             }
         });
     }
-    // Xử lý đăng nhập
+
     private void login() {
         String username = view.getUsername();
         String password = view.getPassword();
@@ -37,10 +36,13 @@ public class LoginController {
 
         String result = model.login(username, password);
 
+        if (result == null || result.startsWith("ERROR")) {
+            view.showMessage("Không thể kết nối server hoặc server đã ngắt kết nối!");
+            return;
+        }
+
         if (result.startsWith("SUCCESS")) {
             String role = result.split(":")[1];
-
-
             if (role.equalsIgnoreCase("admin")) {
                 view.showMessage("Đăng nhập thành công với tư cách Người quản lý!");
             } else if (role.equalsIgnoreCase("nhanvien")) {
@@ -48,15 +50,11 @@ public class LoginController {
             } else {
                 view.showMessage("Đăng nhập thành công với tư cách: " + role);
             }
-
-
             mainController.navigateAfterLogin(role, view);
-
         } else if (result.equals("FAIL")) {
             view.showMessage("Sai username hoặc mật khẩu!");
         } else {
-            view.showMessage("Không đăng nhập được");
+            view.showMessage("Không đăng nhập được!");
         }
     }
-
 }

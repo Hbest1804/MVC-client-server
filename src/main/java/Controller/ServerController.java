@@ -11,63 +11,77 @@ import java.net.Socket;
 public class ServerController {
     private ServerModel model;
     private ServerViews view;
+    private boolean isServerShuttingDown = false;
 
     public ServerController(ServerModel model, ServerViews view) {
         this.model = model;
         this.view = view;
     }
 
+    public void setServerShuttingDown(boolean flag) {
+        this.isServerShuttingDown = flag;
+    }
+
     public void handleClient(Socket clientSocket) {
         String clientName = clientSocket.getInetAddress().toString() + ":" + clientSocket.getPort();
 
-        ObjectOutputStream oos = null;
-        ObjectInputStream ois = null;
+        try (ObjectOutputStream oos = new ObjectOutputStream(clientSocket.getOutputStream());
+             ObjectInputStream ois = new ObjectInputStream(clientSocket.getInputStream())) {
 
-        try {
-            oos = new ObjectOutputStream(clientSocket.getOutputStream());
-            ois = new ObjectInputStream(clientSocket.getInputStream());
+            oos.flush(); // flush ngay sau tạo ObjectOutputStream
+            view.showMessage("Kết nối mới từ: " + clientName);
 
-            // ===== 1) NHẬN LOGIN =====
-            String username = (String) ois.readObject();
-            String password = (String) ois.readObject();
+            boolean isConnected = true;
+            while (isConnected) {
+                try {
+                    Object requestObj = ois.readObject();
+                    if (requestObj == null) continue;
 
-            User user = model.loginDatabase(username, password);
-            if (user == null) user = model.loginTxt(username, password);
+                    String command = requestObj.toString().trim();
 
-            if (user == null) {
-                oos.writeObject("FAIL");
-                oos.flush();
-                view.showMessage(username + " đăng nhập thất bại!");
-                return;
-            }
+                    if (command.equalsIgnoreCase("LOGIN")) {
+                        String username = (String) ois.readObject();
+                        String password = (String) ois.readObject();
+                        User user = model.loginDatabase(username, password);
+                        if (user == null) user = model.loginTxt(username, password);
 
-            oos.writeObject("SUCCESS:" + user.getRole());
-            oos.flush();
-            view.showMessage(username + " đăng nhập thành công (" + user.getRole() + ")");
+                        if (user == null) {
+                            oos.writeObject("FAIL");
+                            oos.flush();
+                            view.showMessage(username + " đăng nhập thất bại!");
+                        } else {
+                            oos.writeObject("SUCCESS:" + user.getRole());
+                            oos.flush();
+                            view.showMessage(username + " đăng nhập thành công (" + user.getRole() + ")");
+                        }
 
-
-            while (true) {
-                Object requestObj = ois.readObject();
-                if (requestObj == null) continue;
-
-                String command = requestObj.toString().trim();
-
-                if (command.equalsIgnoreCase("LOGOUT")) {
-                    view.showMessage(username + " đã đăng xuất.");
+                    } else if (command.equalsIgnoreCase("LOGOUT")) {
+                        view.showMessage("Client đã logout: " + clientName);
+                        isConnected = false; // thoát vòng lặp
+                    } else {
+                        view.showMessage("Nhận từ client: " + command);
+                        oos.writeObject("Server nhận: " + command);
+                        oos.flush();
+                    }
+                } catch (Exception e) {
+                    if (isServerShuttingDown) {
+                        view.showMessage(clientName + " ngắt kết nối do server tắt.");
+                    } else {
+                        view.showMessage(clientName + " ngắt kết nối bất ngờ!");
+                    }
                     break;
-                } else {
-                    view.showMessage("Nhận từ " + username + ": " + command);
-                    oos.writeObject("Server đã nhận: " + command);
-                    oos.flush();
                 }
-
-
-
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-
+            view.showMessage("Lỗi kết nối với client " + clientName);
+        } finally {
+            try {
+                if (!clientSocket.isClosed()) clientSocket.close();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
     }
 }
