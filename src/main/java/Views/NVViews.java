@@ -11,6 +11,7 @@ public class NVViews extends JFrame {
     private JButton btnQuanLyDonHang;
     private JButton btnXemSanPham;
     private JButton btnDangXuat;
+    private JLabel lblWelcome; // label chào mừng
 
     public NVViews(ClientController mainController) {
 
@@ -39,11 +40,18 @@ public class NVViews extends JFrame {
         JLabel title = new JLabel("<html><center><br><font size=5 color='white'>NHÂN VIÊN</font></center></html>");
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
         sidebar.add(title);
-        sidebar.add(Box.createVerticalStrut(30));
+        sidebar.add(Box.createVerticalStrut(15));
+
+        // Label chào mừng
+        lblWelcome = new JLabel("<html><center>Chào mừng!</center></html>");
+        lblWelcome.setForeground(Color.WHITE);
+        lblWelcome.setAlignmentX(Component.CENTER_ALIGNMENT);
+        sidebar.add(lblWelcome);
+        sidebar.add(Box.createVerticalStrut(20));
 
         btnDangXuat = new JButton("🚪 Đăng Xuất");
         styleSidebarButton(btnDangXuat);
-        btnDangXuat.addActionListener(e -> mainController.logout(this)); // gọi logout
+        btnDangXuat.addActionListener(e -> mainController.logout(this));
         sidebar.add(btnDangXuat);
         sidebar.add(Box.createVerticalGlue());
 
@@ -72,6 +80,15 @@ public class NVViews extends JFrame {
 
         content.add(cardPanel, BorderLayout.CENTER);
         add(content, BorderLayout.CENTER);
+    }
+
+    // ===================== HIỂN THỊ TÊN NHÂN VIÊN ======================
+    public void setUsername(String username) {
+        if (username != null && !username.isEmpty()) {
+            lblWelcome.setText("<html><center>Chào mừng nhân viên  "+username  + "!</center></html>");
+        } else {
+            lblWelcome.setText("<html><center>Chào mừng!</center></html>");
+        }
     }
 
     private JButton createCard(String icon, String text) {
@@ -118,7 +135,7 @@ public class NVViews extends JFrame {
         });
     }
 
-    // getter nếu cần
+    // getters nếu cần
     public JButton getBtnBanHang() { return btnBanHang; }
     public JButton getBtnQuanLyDonHang() { return btnQuanLyDonHang; }
     public JButton getBtnXemSanPham() { return btnXemSanPham; }

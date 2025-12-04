@@ -11,27 +11,40 @@ public class Usertxt {
     public List<User> readUsers() {
         List<User> list = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(file_name))) {
+
             String line;
             while ((line = br.readLine()) != null) {
                 line = line.trim();
                 if (line.isEmpty()) continue;
 
                 String[] parts = line.split("\\s+");
-                if (parts.length >= 5) {
+
+                // CHỈ USERNAME PASSWORD ROLE
+                if (parts.length == 3) {
+                    String username = parts[0];
+                    String password = parts[1];
+                    String role = parts[2];
+                    list.add(new User(username, password, role, "", ""));
+                }
+
+                // ĐỦ 5 TRƯỜNG
+                else if (parts.length == 5) {
                     String username = parts[0];
                     String password = parts[1];
                     String role = parts[2];
                     String phone = parts[3];
-                    String employeeCode = parts[4];
-                    list.add(new User(username, password, role, phone, employeeCode));
-                } else {
-                    System.out.println("Dữ liệu dòng không hợp lệ: " + line);
+                    String code = parts[4];
+                    list.add(new User(username, password, role, phone, code));
+                }
+
+                // DÒNG LỖI
+                else {
+                    System.out.println("Dòng không hợp lệ: " + line);
                 }
             }
-        } catch (FileNotFoundException e) {
-            System.out.println("File không tồn tại, sẽ tạo file mới khi ghi dữ liệu.");
-        } catch (IOException e) {
-            e.printStackTrace();
+
+        } catch (Exception e) {
+            System.out.println("Không thể đọc file users.txt");
         }
         return list;
     }

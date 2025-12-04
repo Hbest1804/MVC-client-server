@@ -16,17 +16,17 @@ public class LoginViews extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Panel chính với nền sáng
+
         JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBackground(new Color(245, 245, 245)); // nền sáng hiện đại
+        panel.setBackground(new Color(245, 245, 245));
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
 
-        // Label font đẹp
+
         Font labelFont = new Font("Segoe UI", Font.BOLD, 14);
         Font inputFont = new Font("Segoe UI", Font.PLAIN, 14);
 
-        // Username Label
+
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.EAST;
@@ -34,7 +34,7 @@ public class LoginViews extends JFrame {
         lblUser.setFont(labelFont);
         panel.add(lblUser, gbc);
 
-        // Username TextField
+
         gbc.gridx = 1;
         gbc.gridy = 0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -46,7 +46,7 @@ public class LoginViews extends JFrame {
         ));
         panel.add(txtUsername, gbc);
 
-        // Password Label
+
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.fill = GridBagConstraints.NONE;
@@ -55,7 +55,7 @@ public class LoginViews extends JFrame {
         lblPass.setFont(labelFont);
         panel.add(lblPass, gbc);
 
-        // Password Field
+
         gbc.gridx = 1;
         gbc.gridy = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -67,7 +67,7 @@ public class LoginViews extends JFrame {
         ));
         panel.add(txtPassword, gbc);
 
-        // Login Button đẹp
+
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.gridwidth = 2;
@@ -80,7 +80,7 @@ public class LoginViews extends JFrame {
         btnLogin.setFocusPainted(false);
         btnLogin.setFont(new Font("Segoe UI", Font.BOLD, 14));
 
-        // Hiệu ứng hover
+
         btnLogin.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 btnLogin.setBackground(new Color(30, 136, 229));
@@ -99,7 +99,7 @@ public class LoginViews extends JFrame {
         setVisible(true);
     }
 
-    // Không thay đổi các phương thức khác
+
     public String getUsername() {
         return txtUsername.getText();
     }

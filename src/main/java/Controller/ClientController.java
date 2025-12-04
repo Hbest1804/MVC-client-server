@@ -1,6 +1,7 @@
 package Controller;
 
 import Model.ClientModel;
+import Model.Usertxt;
 import Views.LoginViews;
 import Views.AdminViews;
 import Views.NVViews;
@@ -21,7 +22,6 @@ public class ClientController {
 
 
     public void showLogin() {
-
         this.model = new ClientModel("localhost", 9999);
         LoginViews loginView = new LoginViews();
         new LoginController(loginView, model, this);
@@ -30,32 +30,36 @@ public class ClientController {
 
 
     public void navigateAfterLogin(String role, LoginViews loginView) {
-        loginView.dispose(); // đóng login
-        if (role.equalsIgnoreCase("admin")) showAdmin();
-        else if (role.equalsIgnoreCase("nhanvien")) showStaffDashboard();
+        loginView.dispose();
+        String username = loginView.getUsername(); // lấy tên từ login
+        if (role.equalsIgnoreCase("admin")) showAdmin(username);
+        else if (role.equalsIgnoreCase("nhanvien")) showStaffDashboard(username);
     }
 
 
-    private void showAdmin() {
+    private void showAdmin(String username) {
         if (adminView == null) {
-            adminView = new AdminViews(this);
+            adminView = new AdminViews(this, username);
+        } else {
+            adminView.setUsername(username);
         }
         adminView.setVisible(true);
-        if (nvView != null) nvView.setVisible(false); // ẩn NV nếu đang mở
+        if (nvView != null) nvView.setVisible(false);
     }
 
 
-    private void showStaffDashboard() {
+    private void showStaffDashboard(String username) {
         if (nvView == null) {
             nvView = new NVViews(this);
         }
+        nvView.setUsername(username);
         nvView.setVisible(true);
         if (adminView != null) adminView.setVisible(false);
     }
 
 
     public void openAccountManager() {
-        Model.Usertxt txtModel = new Model.Usertxt();
+        Usertxt txtModel = new Usertxt();
         AccountController accountController = new AccountController(txtModel);
         new AccountViews(accountController, this);
     }
@@ -78,6 +82,6 @@ public class ClientController {
 
     public void backToAdmin() {
         if (nvView != null) nvView.setVisible(false);
-        showAdmin();
+        if (adminView != null) adminView.setVisible(true);
     }
 }

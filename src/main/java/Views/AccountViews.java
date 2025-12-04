@@ -42,7 +42,7 @@ public class AccountViews extends JFrame {
 
         setLayout(new BorderLayout());
 
-        // ================= HEADER ===================
+
         JPanel header = new JPanel(new BorderLayout());
         header.setBackground(headerColor);
         header.setPreferredSize(new Dimension(900, 70));
@@ -54,7 +54,7 @@ public class AccountViews extends JFrame {
 
         add(header, BorderLayout.NORTH);
 
-        // ================= TABLE ===================
+
         tableModel = new DefaultTableModel(
                 new Object[]{"Username", "Password", "Vai trò", "Phone", "Mã NV"}, 0) {
             @Override

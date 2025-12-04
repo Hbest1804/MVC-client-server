@@ -20,7 +20,6 @@ public class Server {
         try (ServerSocket serverSocket = new ServerSocket(9999)) {
             view.showMessage("Server đang chạy trên cổng 9999...");
 
-
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 controller.setServerShuttingDown(true);
                 view.showMessage("Server đang tắt, ngắt kết nối tất cả client...");
