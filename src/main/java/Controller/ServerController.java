@@ -28,7 +28,7 @@ public class ServerController {
         try (ObjectOutputStream oos = new ObjectOutputStream(clientSocket.getOutputStream());
              ObjectInputStream ois = new ObjectInputStream(clientSocket.getInputStream())) {
 
-            oos.flush(); // flush ngay sau tạo ObjectOutputStream
+            oos.flush();
             view.showMessage("Kết nối mới từ: " + clientName);
 
             boolean isConnected = true;
@@ -57,7 +57,7 @@ public class ServerController {
 
                     } else if (command.equalsIgnoreCase("LOGOUT")) {
                         view.showMessage("Client đã logout: " + clientName);
-                        isConnected = false; // thoát vòng lặp
+                        isConnected = false;
                     } else {
                         view.showMessage("Nhận từ client: " + command);
                         oos.writeObject("Server nhận: " + command);

@@ -31,7 +31,7 @@ public class ClientController {
 
     public void navigateAfterLogin(String role, LoginViews loginView) {
         loginView.dispose();
-        String username = loginView.getUsername(); // lấy tên từ login
+        String username = loginView.getUsername(); 
         if (role.equalsIgnoreCase("admin")) showAdmin(username);
         else if (role.equalsIgnoreCase("nhanvien")) showStaffDashboard(username);
     }
